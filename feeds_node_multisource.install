@@ -1,0 +1,83 @@
+<?php
+// $Id: feeds_node_multisource.install,v 1.2 2010/07/24 15:37:31 andrewlevine Exp $
+
+/**
+ * Implementation of hook_schema().
+ */
+function feeds_node_multisource_schema() {
+  $schema = array();
+
+  $schema['feeds_node_multisource_item'] = array(
+    'description' => t('Stores additional information about feed item nodes. Used by FeedsNodeMultisourceProcessor.'),
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => t("Primary Key: The feed item node's nid."),
+      ),
+      'id' => array(
+        'type' => 'varchar',
+        'length' => 128,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The id of the fields object that is the producer of this item.',
+      ),
+      'feed_nid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => t("Node id of the owner feed, if available."),
+      ),
+      'imported' => array(
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => t('Import date of the feed item, as a Unix timestamp.'),
+      ),
+      'url' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'description' => t('Link to the feed item.'),
+      ),
+      'guid' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'description' => t('Unique identifier for the feed item.'),
+      ),
+      'hash' => array(
+        'type' => 'varchar',
+        'length' => 32, // The length of an MD5 hash.
+        'not null' => TRUE,
+        'default' => '',
+        'description' => t('The hash of the item.'),
+      ),
+    ),
+    'primary key' => array('nid', 'feed_nid'),
+    'indexes' => array(
+      'id' => array('id'),
+      'feed_nid' => array('feed_nid'),
+      'imported' => array('imported'),
+      'url' => array(array('url', 255)),
+      'guid' => array(array('guid', 255)),
+    ),
+  );
+  return $schema;
+}
+
+/**
+ * Implementation of hook_install().
+ */
+function feeds_node_multisource_install() {
+  // Create tables.
+  drupal_install_schema('feeds_node_multisource');
+}
+
+/**
+ * Implementation of hook_enable().
+ */
+function feeds_node_multisource_enable() {
+  // Clear the feeds plugin cache so our plugin will immediately show up on
+  // module enable.
+  cache_clear_all('plugins:feeds:plugins', 'cache');
+}

@@ -1,0 +1,43 @@
+<?php
+// $Id: feeds_node_multisource.module,v 1.1 2010/07/08 21:39:49 andrewlevine Exp $
+
+/**
+ * Implementation of hook_feeds_plugins().
+ */
+function feeds_node_multisource_feeds_plugins() {
+  $path = drupal_get_path('module', 'feeds_node_multisource') .'/plugins';
+  $info = array();
+
+  $info['FeedsNodeMultisourceProcessor'] = array(
+    'name' => 'Node Multisource Processor',
+    'description' => 'Allows importing data from multiple sources into already imported nodes.',
+    'help' => 'Allows importing data from multiple sources into already imported nodes.',
+    'handler' => array(
+      'parent' => 'FeedsNodeProcessor',
+      'class' => 'FeedsNodeMultisourceProcessor',
+      'file' => 'FeedsNodeMultisourceProcessor.inc',
+      'path' => $path,
+    ),
+  );
+  
+  return $info;
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function feeds_node_multisource_nodeapi(&$node, $op, $a3 = NULL, $a4  = NULL) {
+  switch ($op) {
+    case 'load':
+      $result = db_query("SELECT imported, guid, url, feed_nid FROM {feeds_node_multisource_item} WHERE nid = %d", $node->nid);
+      while ($row = db_fetch_object($result)) {
+        $node->feeds_node_multisource_item[$row->feed_nid] = $row;
+      }
+      break;
+    case 'delete':
+      if (isset($node->feeds_node_item)) {
+        db_query("DELETE FROM {feeds_node_multisource_item} WHERE nid = %d", $node->nid);
+      }
+      break;
+  }
+}

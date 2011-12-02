@@ -1,0 +1,15 @@
+;$Id: feeds_node_multisource.info,v 1.1 2010/07/08 21:39:49 andrewlevine Exp $
+name = Feeds Node Multisource Importer
+description = Allows importing data from multiple sources into already imported nodes.
+package = Feeds
+dependencies[] = feeds
+core = 6.x
+php = 5.2
+
+
+; Information added by drupal.org packaging script on 2010-10-08
+version = "6.x-1.0-beta3"
+core = "6.x"
+project = "feeds_node_multisource"
+datestamp = "1286546764"
+
